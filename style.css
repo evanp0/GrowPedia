@@ -37,30 +37,37 @@ body {
 }
 
 #sidebar{
-    width: 70px;
-    min-width: 70px;
+    width: 85px;
+    min-width: 85px;
     z-index: 1000;
     transition: all 0.25s ease-in-out;
     display: flex;
     flex-direction: column;
-    background-color: #0e223e;
+    background-color: #2d6a4f;
 }
 
-#sidebar.expand{
-    width: 260px;
-    min-width: 260px;
+.sidebar-expanded #sidebar {
+  width: 260px;
+  min-width: 260px;
 }
 
+
+#toggle-btn {
+  background: transparent;
+  cursor: pointer;
+  border: none;
+  padding: 1rem 0;
+  width: 85px;            /* fixed width same as collapsed sidebar */
+  display: flex;
+  justify-content: center; /* center icon inside this fixed width */
+  align-items: center;
+  box-sizing: border-box;
+}
 #toggle-btn{
     background: transparent;
     cursor: pointer;
     border: 0;
     padding: 1rem 1.5rem;
-}
-
-#toggle-btn i {
-    font-size: 1.5rem;
-    color: #fff;
 }
 
 .sidebar-logo{
@@ -73,9 +80,27 @@ body {
     font-weight: 600;
 }
 
+.logo-img {
+  height: 65px;
+  width: auto;
+  display: inline-block;
+  filter: drop-shadow(0 0 2px rgba(49, 100, 49, 0.7));
+}
+
 #sidebar:not(.expand) .sidebar-logo,
-#sidebar:not(.expand) a.sidebar-link span {
-    display: none;
+#sidebar:not(.expand) .sidebar-link span {
+  opacity: 0;
+  transform: translateX(-5px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: inline-block;
+}
+
+#sidebar.expand .sidebar-logo,
+#sidebar.expand .sidebar-link span {
+  opacity: 1;
+  transform: translateX(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition-delay: 0.1s;
 }
 
 .sidebar-nav{
@@ -86,10 +111,14 @@ body {
 a.sidebar-link{
     padding: .625rem 1.625rem;
     color: #FFF;
-    display: block;
+    display: flex;
+    gap: .5rem;
+    align-items: center;
     font-size: 1.5rem;
     white-space: nowrap;
     border-left: 3px solid transparent;
+    width: 100%;
+    transition: all .25s ease-in-out;
 }
 
 .sidebar-link{
@@ -97,7 +126,14 @@ a.sidebar-link{
     margin-right: .75rem;
 }
 
+.sidebar-link.active-link{
+    background-color: rgba(255,255,255,.075);
+    border-left: 5px solid #0bb10b;
+}
+
 a.sidebar-link:hover{
     background-color: rgba(255,255,255,.075);
-    border-left: 3px solid #3b7ddd;
+    border-left: 5px solid #0bb10b;
 }
+
+
