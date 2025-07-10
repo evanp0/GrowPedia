@@ -144,6 +144,11 @@ a.sidebar-link:hover{
     height: 100vh;
     overflow: auto;
     background-color: #edf6f5;
+    background-image: url('test.png');
+    background-repeat: repeat;
+    background-size: 150px 150px;
+    background-color: #edf6f5;
+    
 }
 .login-box {
     width: 30vw;
@@ -157,10 +162,6 @@ a.sidebar-link:hover{
     flex-direction: column;
     padding: 2rem;
     gap: 2rem; /* adds spacing between header and form */
-}
-
-.header {
-    text-align: center;
 }
 
 .login-info {
