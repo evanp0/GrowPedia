@@ -7,15 +7,28 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 //login
 const loginBtn = document.getElementById("loginBtn");
 loginBtn?.addEventListener("click", async () => {
-    const email = document.getElementById("inEmail").value;
-    const password = document.getElementById("inPassword").value;
+    const email = document.getElementById("inEmail");
+    const password = document.getElementById("inPassword");
     const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.value,
+        password: password.value,
     });
 
     if (error) {
-        console.log(error.message);
+        const loginErr = document.getElementById("loginErr");
+        loginErr.style.color = "red";
+        console.error("Error logging in:", error);
+        if (error.status === 400) {
+            loginErr.innerText = "Invalid email or password.";
+            email.value = "";
+            password.value = "";
+        } else if (error.status === 401) {
+            loginErr.innerText = "Unauthorized: Please verify your email.";
+        } else {
+            loginErr.innerText = error.message;
+        }
+
+        return;
     } else {
         const userId = data.user.id;
 
@@ -40,21 +53,34 @@ const signupBtn = document.getElementById("signupBtn");
 signupBtn?.addEventListener("click", async () => {
     const email = document.getElementById("outEmail").value;
     const password = document.getElementById("outPassword").value;
-    const username = document.getElementById("outUsername").value;
 
-    const { error: signUpError, user } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            emailRedirectTo: '../auth.html'
-        }
-    });
-
-    if (signUpError) {
-        console.log(signUpError.message);
-    } else {
-        window.location.href = "auth.html";
+    const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+        emailRedirectTo: 'https://evanp0.github.io/GrowPedia/auth.html'
     }
+});
+
+const signupErr = document.getElementById("signupErr");
+
+if (signupErr) signupErr.innerText = ""; // clear old errors
+
+if (error) {
+    signupErr.style.color = "red";
+    if (error.message === "User already registered" || error.status === 409) {
+        signupErr.innerText = "Email already exists. Try logging in.";
+    } else {
+        signupErr.innerText = error.message;
+    }
+} else if (!data.user) {
+    // <- Supabase gave no error but also no user
+    signupErr.style.color = "red";
+    signupErr.innerText = "This email may already be registered. Try logging in.";
+} else {
+    signupErr.style.color = "green";
+    signupErr.innerText = "Signup successful! Please check your email to confirm.";
+}
 });
 
 
