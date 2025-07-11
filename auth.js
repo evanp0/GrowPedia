@@ -9,7 +9,7 @@ const loginBtn = document.getElementById("loginBtn");
 loginBtn?.addEventListener("click", async () => {
     const email = document.getElementById("inEmail").value;
     const password = document.getElementById("inPassword").value;
-    const { error, session } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
     });
@@ -45,6 +45,9 @@ signupBtn?.addEventListener("click", async () => {
     const { error: signUpError, user } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            emailRedirectTo: '../auth.html'
+        }
     });
 
     if (signUpError) {
@@ -58,16 +61,22 @@ signupBtn?.addEventListener("click", async () => {
 //username
 const userBtn = document.getElementById("userBtn");
 userBtn?.addEventListener("click", async () => {
-    const username = document.getElementById("username").value;
-    const { insertError } = await supabase.from("users").insert([
-        {
-            username: username,
-        },
-    ]);
-
-    if (insertError){
-        console.log(insertError);
-    } else {
-        window.location.href = "index.html"
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+        console.error("Error fetching session:", error);
+        return;
     }
+    const userId = data.session.user.id;
+    console.log("User ID:", userId);
+    const username = document.getElementById("username").value;
+    await supabase
+        .from("users")
+        .update({ username: username })
+        .eq("id", userId)
+        .then(() => {
+            window.location.href = "index.html";
+        })
+        .catch((error) => {
+            console.error("Update failed:", error);
+        });
 });
