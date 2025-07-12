@@ -42,10 +42,8 @@ loginBtn?.addEventListener("click", async () => {
             console.error(profileError.message);
         } else if (!profile.username) {
             window.location.href = "username.html";
-        } else {
-            checkData().then(() => {
-                window.location.href = "index.html";
-            });
+        } else {  
+            window.location.href = "index.html";
         }
     }
 });
@@ -60,7 +58,7 @@ signupBtn?.addEventListener("click", async () => {
         email: email.value,
         password: password.value,
         options: {
-            emailRedirectTo: 'https://evanp0.github.io/GrowPedia/auth.html'
+            emailRedirectTo: 'https://evanp0.github.io/GrowPedia/confirm.html'
         }
     });
 
@@ -116,48 +114,3 @@ window.addEventListener("DOMContentLoaded", () => {
     loginBox.classList.remove("hidden-login-box");
     loginBox.classList.add("visible-login-box");
 });
-
-async function checkData() {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) {
-        console.error("Error fetching session:", error);
-        return;
-    }
-    const userId = data.session.user.id;
-
-    const { data: userData, error: fetchError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-    if (fetchError) {
-        console.error("Error fetching user info:", fetchError);
-    }
-
-    if (!userData.profile_info) {
-        console.log("User has no data, generating now...");
-        const data = {
-            "bio": "Edit profile to change bio.",
-            "lessons_completed": 0,
-            "lessons_created": 0,
-            "quizzes_completed": 0,
-            "questions_answered": 0,
-            "questions_correct": 0,
-            "badges": [],
-        }
-
-        const { error } = await supabase
-            .from('users')
-            .update(({ profile_info: data }))
-            .eq('id', userId);
-        if (error) {
-            console.log("Error generating data:", error);
-        } else {
-            console.log("Successfully generated data:", data)
-        }
-
-    } else {
-        console.log("User has data!");
-    }
-}

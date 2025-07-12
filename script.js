@@ -79,10 +79,11 @@ async function loadProfile() {
     .eq("id", userId)
     .single();
 
-  if (fetchError){
+  if (fetchError) {
     console.error("Error fetching user info:", fetchError);
   }
   const max = xpMaxForLevel(userData.level)
+  const accuracy = userData.profile_info.questions_correct / userData.profile_info.questions_answered || 0;
   console.log(JSON.stringify(userData))
   console.log((userData.profile_info.questions_answered))
   console.log(userData.profile_info.questions_correct)
@@ -95,9 +96,29 @@ async function loadProfile() {
   document.getElementById("xp-bar").style.width = ((userData.exp / max) * 100) + "%"
   document.getElementById("quizzes-taken").textContent = userData.profile_info.quizzes_completed
   document.getElementById("lessons-completed").textContent = userData.profile_info.lessons_completed
-  document.getElementById("accuracy").textContent = ((userData.profile_info.questions_answered) / (userData.profile_info.questions_correct)) * 100 + "%"
+  document.getElementById("accuracy").textContent = (accuracy) * 100 + "%"
 }
 
 function xpMaxForLevel(level) {
-  return Math.floor(100 + 20 * (level-1) + (level-1) ** 1.3);
+  return Math.floor(100 + 20 * (level - 1) + (level - 1) ** 1.3);
 }
+
+const editBtn = document.getElementById("edit-profile-btn");
+editBtn?.addEventListener("click", () => {
+  const centerBox = document.querySelector(".custom-center-box");
+  const overlay = document.getElementById("centerOverlay");
+  centerBox.classList.remove("hidden-custom-center-box");
+  centerBox.classList.add("visible-custom-center-box");
+  overlay.classList.remove("hidden-overlay");
+  overlay.classList.add("visible-overlay");
+});
+const closeBtn = document.getElementById("close-btn");
+closeBtn?.addEventListener("click", () => {
+  console.log("Close button clicked");
+  const centerBox = document.querySelector(".custom-center-box");
+  const overlay = document.getElementById("centerOverlay");
+  centerBox.classList.remove("visible-custom-center-box");
+  centerBox.classList.add("hidden-custom-center-box");
+  overlay.classList.remove("visible-overlay");
+  overlay.classList.add("hidden-overlay");
+});
