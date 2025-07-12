@@ -17,11 +17,11 @@ loginBtn?.addEventListener("click", async () => {
     if (error) {
         const loginErr = document.getElementById("loginErr");
         loginErr.style.color = "red";
+        email.value = "";
+        password.value = "";
         console.error("Error logging in:", error);
         if (error.status === 400) {
             loginErr.innerText = "Invalid email or password.";
-            email.value = "";
-            password.value = "";
         } else if (error.status === 401) {
             loginErr.innerText = "Unauthorized: Please verify your email.";
         } else {
@@ -43,7 +43,9 @@ loginBtn?.addEventListener("click", async () => {
         } else if (!profile.username) {
             window.location.href = "username.html";
         } else {
-            window.location.href = "index.html";
+            checkData().then(() => {
+                window.location.href = "index.html";
+            });
         }
     }
 });
@@ -51,37 +53,39 @@ loginBtn?.addEventListener("click", async () => {
 //signup
 const signupBtn = document.getElementById("signupBtn");
 signupBtn?.addEventListener("click", async () => {
-    const email = document.getElementById("outEmail").value;
-    const password = document.getElementById("outPassword").value;
+    const email = document.getElementById("outEmail")
+    const password = document.getElementById("outPassword");
 
     const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-        emailRedirectTo: 'https://evanp0.github.io/GrowPedia/auth.html'
+        email: email.value,
+        password: password.value,
+        options: {
+            emailRedirectTo: 'https://evanp0.github.io/GrowPedia/auth.html'
+        }
+    });
+
+    const signupErr = document.getElementById("signupErr");
+    if (signupErr) {
+        signupErr.innerText = "";
+        signupErr.style.color = "red";
+        email.value = ""
+        password.value = ""
     }
-});
+    if (error) {
+        if (error.status === 400) {
+            signupErr.innerText = "Invalid email or password.";
 
-const signupErr = document.getElementById("signupErr");
-
-if (signupErr) signupErr.innerText = ""; // clear old errors
-
-if (error) {
-    signupErr.style.color = "red";
-    if (error.message === "User already registered" || error.status === 409) {
-        signupErr.innerText = "Email already exists. Try logging in.";
+        } else if (!data.user || data.user?.identities?.length === 0) {
+            signupErr.style.color = "red";
+            signupErr.innerText = "This email is already registered";
+        }
     } else {
-        signupErr.innerText = error.message;
+        signupErr.style.color = "green";
+        signupErr.innerText = "Signup successful! Check your email to confirm and sign in.";
     }
-} else if (!data.user) {
-    // <- Supabase gave no error but also no user
-    signupErr.style.color = "red";
-    signupErr.innerText = "This email may already be registered. Try logging in.";
-} else {
-    signupErr.style.color = "green";
-    signupErr.innerText = "Signup successful! Please check your email to confirm.";
-}
+
 });
+
 
 
 //username
@@ -106,3 +110,54 @@ userBtn?.addEventListener("click", async () => {
             console.error("Update failed:", error);
         });
 });
+
+window.addEventListener("DOMContentLoaded", () => {
+    const loginBox = document.querySelector(".login-box");
+    loginBox.classList.remove("hidden-login-box");
+    loginBox.classList.add("visible-login-box");
+});
+
+async function checkData() {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+        console.error("Error fetching session:", error);
+        return;
+    }
+    const userId = data.session.user.id;
+
+    const { data: userData, error: fetchError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+    if (fetchError) {
+        console.error("Error fetching user info:", fetchError);
+    }
+
+    if (!userData.profile_info) {
+        console.log("User has no data, generating now...");
+        const data = {
+            "bio": "Edit profile to change bio.",
+            "lessons_completed": 0,
+            "lessons_created": 0,
+            "quizzes_completed": 0,
+            "questions_answered": 0,
+            "questions_correct": 0,
+            "badges": [],
+        }
+
+        const { error } = await supabase
+            .from('users')
+            .update(({ profile_info: data }))
+            .eq('id', userId);
+        if (error) {
+            console.log("Error generating data:", error);
+        } else {
+            console.log("Successfully generated data:", data)
+        }
+
+    } else {
+        console.log("User has data!");
+    }
+}

@@ -33,3 +33,71 @@ logoutBtn?.addEventListener("click", async () => {
   }
   window.location.href = "login.html";
 });
+
+addEventListener("DOMContentLoaded", () => {
+  if (window.location.pathname.includes("profile.html")) {
+    loadProfile();
+  }
+})
+
+async function getUserProfile() {
+  try {
+    const { data: userProfile, error } = await supabase.from("users").select('*');
+
+
+    if (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+
+
+    if (!userProfile || userProfile.length === 0) {
+      console.log("No user profile found.");
+      return null;
+    }
+
+
+    console.log("User Profile Data:", userProfile);
+    return userProfile;
+  } catch (error) {
+    console.error("Unexpected error fetching user profile:", error);
+    return null;
+  }
+}
+
+async function loadProfile() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    console.error("Error fetching session:", error);
+    return;
+  }
+  const userId = data.session.user.id;
+
+  const { data: userData, error: fetchError } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (fetchError){
+    console.error("Error fetching user info:", fetchError);
+  }
+  const max = xpMaxForLevel(userData.level)
+  console.log(JSON.stringify(userData))
+  console.log((userData.profile_info.questions_answered))
+  console.log(userData.profile_info.questions_correct)
+  document.getElementById("username").textContent = userData.username;
+  document.getElementById("user-bio").textContent = userData.profile_info.bio;
+  document.getElementById("level").textContent = userData.level;
+  document.getElementById("xp").textContent = userData.exp;
+  document.getElementById("maxXp").textContent = max;
+  document.getElementById("avatar").src = userData.avatar_url
+  document.getElementById("xp-bar").style.width = ((userData.exp / max) * 100) + "%"
+  document.getElementById("quizzes-taken").textContent = userData.profile_info.quizzes_completed
+  document.getElementById("lessons-completed").textContent = userData.profile_info.lessons_completed
+  document.getElementById("accuracy").textContent = ((userData.profile_info.questions_answered) / (userData.profile_info.questions_correct)) * 100 + "%"
+}
+
+function xpMaxForLevel(level) {
+  return Math.floor(100 + 20 * (level-1) + (level-1) ** 1.3);
+}
