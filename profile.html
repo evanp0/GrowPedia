@@ -85,10 +85,35 @@
             </div>
         </aside>
         <div class="main p-3">
-            <div class="center-overlay" id="centerOverlay">
-                <div class="custom-center-box">
-                    <button class="close-btn" id="close-btn">&times;</button>
-                    <p class="text-center mt-3">Centered Square</p>
+            <div class="center-overlay hidden-overlay" id="centerOverlay">
+                <div class="custom-center-box hidden-custom-center-box">
+                    <form id="edit-profile-form" class="w-100">
+                        <h4 class="mb-3" style="font-size: 1.5rem;">Edit Profile</h4>
+
+                        <div class="mb-3">
+                            <label for="edit-avatar" class="form-label">Profile Picture</label>
+                            <div class="d-flex justify-content-between">
+                                <input type="file" id="myFile" name="filename" class="form-control me-2" accept="image/png, image/jpeg">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="edit-username"
+                                placeholder="Enter your username">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit-bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="edit-bio" rows="3"
+                                placeholder="Tell us about yourself..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-success" id="submit-btn">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <div class="container">
@@ -99,7 +124,7 @@
                         <div class="card mb-4 shadow-sm">
                             <div class="card-body text-center">
                                 <img id="avatar" class="avatar rounded-circle mx-auto mb-3"
-                                    style="width: 100px; height: 100px; background-color: #2d6a4f; color: white; font-size: 3rem; line-height: 100px;"
+                                    style="width: 100px; height: 100px; object-fit: cover; background-color: #2d6a4f; color: white; font-size: 3rem; line-height: 100px;"
                                     src="">
 
                                 </img>
