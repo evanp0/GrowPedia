@@ -264,3 +264,13 @@ a.sidebar-link:hover{
   opacity: 1;
   transition: visibility 0s linear 0s, opacity 0.4s ease;
 }
+
+.lesson{
+    width: 445px;
+    margin-bottom: 15rem;
+
+}
+
+.lesson-box{
+    justify-content: start;
+}
